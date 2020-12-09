@@ -1,0 +1,23 @@
+{
+  "name": "rocket-chat-daily-standup",
+  "version": "1.0.0",
+  "description": "Chatbot for EduCS RocketChat",
+  "scripts": {
+    "bot": "node index.js",
+    "debug": "node -r dotenv/config index.js"
+  },
+  "dependencies": {
+    "rocketchat-js-sdk": "^0.2.9-11"
+  },
+  "devDependencies": {
+    "dotenv": "^6.2.0"
+  },
+  "repository": {
+    "url": "https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "rocketchat",
+    "standup"
+  ]
+}

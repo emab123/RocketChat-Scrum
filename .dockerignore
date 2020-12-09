@@ -1,0 +1,6 @@
+.env
+.env-example
+.gitlab-ci.yml
+node_modules
+data.json
+Dockerfile
