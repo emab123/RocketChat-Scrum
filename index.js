@@ -1,13 +1,14 @@
 const runbot = require("./lib");
 
 //sanity checks
+function ensure_env(name) {
+    if(!process.env[name]) {
+        console.error(`Missing mandatory env parameter ${name}`);
+        process.exit(1);
+    }
+}
 
-if(!process.env.ROCKETCHAT_URL ||
-   !process.env.ROCKETCHAT_USER ||
-   !process.env.ROCKETCHAT_PASSWORD) {
-       console.error("Not correctly configured! Rocket-Chat credentials / url is missing");
-       process.exit(1);
-   }
+["ROCKETCHAT_URL", "ROCKETCHAT_USER", "DATA_FILE", "ROCKETCHAT_PASSWORD"].map(ensure_env);
 
 
 //simply start the bot ...
