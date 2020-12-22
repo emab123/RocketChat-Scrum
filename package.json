@@ -4,13 +4,18 @@
   "description": "Chatbot for EduCS RocketChat",
   "scripts": {
     "bot": "node index.js",
-    "debug": "node -r dotenv/config index.js"
+    "debug": "node -r dotenv/config index.js",
+    "test": "mocha ./test/**/*.spec.js"
   },
   "dependencies": {
+    "loglevel": "^1.7.1",
     "rocketchat-js-sdk": "^0.2.9-11"
   },
   "devDependencies": {
-    "dotenv": "^6.2.0"
+    "chai": "^4.2.0",
+    "dotenv": "^6.2.0",
+    "mocha": "^8.2.1",
+    "sinon": "^9.2.2"
   },
   "repository": {
     "url": "https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup.git"

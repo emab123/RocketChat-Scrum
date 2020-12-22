@@ -1,20 +1,41 @@
+variables:
+  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
 stages:
   - build
+  - release
   - deploy
+
+#in general login
 
 build:
   stage: build
   tags:
     - docker builder
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
-  script:
+  before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $IMAGE_TAG .
-    - docker push $IMAGE_TAG
+  script:
+    - docker build --pull -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
+
+release-image:
+  stage: release
+  tags:
+    - docker builder
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $TEST_IMAGE
+    - docker tag $TEST_IMAGE $RELEASE_IMAGE
+    - docker push $RELEASE_IMAGE
+  only:
+    - master
 
 deploy:
   stage: deploy
   image: curlimages/curl
   script:
     - "curl -X POST -F token=$TRIGGER_TOKEN -F ref=$CI_COMMIT_BRANCH https://gitlab.tba-hosting.de/api/v4/projects/317/trigger/pipeline"
+  only:
+    - master
