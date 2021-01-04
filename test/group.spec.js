@@ -4,9 +4,8 @@ const sinon = require("sinon");
 const log = require("loglevel");
 const Group = require("../lib/group");
 
-describe.only("Groups", () => {
+describe("Groups", () => {
     it("Loads a group and applies defaults", () => {
-        process.env.BOT_TIME_NAG = "0:1";
         process.env.BOT_TIME_SUMMARY = "11:12";
         let g = new Group({fname: "test", name: "test1", _id: "id"});
         expect(g._id).to.be.eq("id");
@@ -15,8 +14,6 @@ describe.only("Groups", () => {
         expect(g.users).to.be.instanceOf(Map);
         expect(g.responses).to.be.deep.eq([]);
         expect(g.reportDays).to.be.deep.eq([1,2,3,4,5]);
-        expect(g.nag_time.getHours()).to.be.eq(0);
-        expect(g.nag_time.getMinutes()).to.be.eq(1);
         expect(g.summary_time.getHours()).to.be.eq(11);
         expect(g.summary_time.getMinutes()).to.be.eq(12);
     });

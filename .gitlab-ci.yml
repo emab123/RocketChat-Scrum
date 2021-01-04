@@ -4,6 +4,7 @@ variables:
 
 stages:
   - build
+  - test
   - release
   - deploy
 
@@ -18,6 +19,16 @@ build:
   script:
     - docker build --pull -t $TEST_IMAGE .
     - docker push $TEST_IMAGE
+
+test:
+  stage: test
+  tags:
+    - docker builder
+  before_script:
+    - echo "Trying to log into $CI_REGISTRY"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker run --rm $TEST_IMAGE npm test
 
 release-image:
   stage: release

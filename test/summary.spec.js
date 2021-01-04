@@ -5,6 +5,7 @@ const rocket = require("./mock_rocket");
 const supData = require("./mock_supdata");
 const summary = require("../lib/summary");
 const messages = require("../lib/messages");
+const Group = require('../lib/group');
 
 log.setDefaultLevel(5);
 
@@ -14,7 +15,7 @@ log.setDefaultLevel(5);
 function genFakeMessage() {
     let g = supData.groups.find(e => e._id == "test-id1");
     g.responses.push({
-        "user": "test" + supData.responses.length,
+        "user": "test" + g.responses.length,
         "stage": 1 + arguments.length,
         "messages": arguments
     });
@@ -22,8 +23,8 @@ function genFakeMessage() {
 
 describe("Summary", () => {
     beforeEach(() => {
-        supData.addGroup("test-id1", "Test1", "test1");
-        supData.addGroup("test-id2", "Test2", "test2");
+        supData.groups.push(new Group({_id: "test-id1", fname: "Test 1", name: "test1", _summary: [0,0], reportDays: [0,1,2,3,4,5,6]}));
+        supData.groups.push(new Group({_id: "test-id2", fname: "Test 2", name: "test2", _summary: [0,0], reportDays: [0,1,2,3,4,5,6]}));
     });
     afterEach(() => {
         rocket.driver.reset();
@@ -44,8 +45,6 @@ describe("Summary", () => {
         expect(i).to.be.null;
     });
     it("updates the groups when iterating", async () => {
-        supData.publish = [0,0];
-        supData.last_summary = new Date(0);
         await summary.setup(false);
         expect(supData.findGroups.called).to.be.true;
     });
@@ -55,7 +54,7 @@ describe("Summary", () => {
             bot: { i: 'js.SDK' },
             attachments: [
                 {
-                    title: messages.getMessage(messages.stageToMessage(0), { group: { fname: "Test1" } }),
+                    title: messages.getMessage(messages.stageToMessage(0), { group: { fname: "Test 1" } }),
                     fields: [
                         {
                             short: false,
@@ -83,8 +82,6 @@ describe("Summary", () => {
                 }
             ]
         }, "test-id1");
-        supData.publish = [0, 0]
-        supData.last_summary = new Date(0);
         genFakeMessage("works", "awesome", "totally")
         genFakeMessage("even", "Better", "than before");
         await summary.setup(false);
@@ -96,7 +93,7 @@ describe("Summary", () => {
             bot: { i: 'js.SDK' },
             attachments: [
                 {
-                    title: messages.getMessage(messages.stageToMessage(0), { group: { fname: "Test1" } }),
+                    title: messages.getMessage(messages.stageToMessage(0), { group: { fname: "Test 1" } }),
                     fields: [
                         {
                             short: false,
@@ -125,29 +122,33 @@ describe("Summary", () => {
             ]
 
         }, "test-id1");
-        supData.publish = [0, 0];
-        supData.last_summary = new Date();
         genFakeMessage("works", "immediately", "not");
+        supData.groups[0].last_summary = new Date();
+        supData.groups[1].last_summary = new Date();
         await summary.setup(false);
         expect(rocket.driver.messages).length(1);
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
     it("sends messages to multiple groups", async () => {
-        supData.publish = [0, 0];
-        supData.last_summary = new Date();
-        genFakeMessage("works", "immediately", "not");
-        genFakeMessage("works", "immediately", "not");
-        supData.responses[0].group = supData.groups[1];
+        supData.groups[0].responses.push({
+            user: "test0",
+            stage: 4,
+            messages: ["works", "immediately", "not"]
+        });
+        supData.groups[1].responses.push({
+            user: "test0",
+            stage: 4,
+            messages: ["works", "immediately", "not"]
+        });
         await summary.setup(false);
         expect(rocket.driver.messages).lengthOf(2);
-        expect(rocket.driver.messages[0]).has.property("rid", "test-id2");
+        expect(rocket.driver.messages[0]).has.property("rid", "test-id1");
+        expect(rocket.driver.messages[1]).has.property("rid", "test-id2");
     });
     it("captures exceptions", async () => {
         let old = rocket.driver.sendMessage;
         rocket.driver.sendMessage = sinon.stub().throws();
         sinon.stub(log, "error");
-        supData.publish = [0, 0];
-        supData.last_summary = new Date();
         genFakeMessage("works", "immediately", "not");
         genFakeMessage("works", "immediately", "not");
         try {

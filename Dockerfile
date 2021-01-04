@@ -4,7 +4,7 @@ WORKDIR /app
 ADD . /app
 
 RUN apk add --no-cache git &&\
-    npm install --production
+    npm install
 
 ENV DATA_FILE /data/data.json
 VOLUME /data
