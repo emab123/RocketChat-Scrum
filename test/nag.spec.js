@@ -8,7 +8,7 @@ const messages = require("../lib/messages");
 const Group = require("../lib/group");
 
 
-log.setDefaultLevel(5);
+log.setDefaultLevel(0);
 
 
 describe("Nagging", () => {
@@ -41,6 +41,9 @@ describe("Nagging", () => {
         }) 
         it("nags only online users", async () => {
             supData.nag.last = new Date(0);
+            supData.nag.time = [0,0];
+            rocket.api.get.resetHistory();
+            rocket.api.get.returns({members: []});
             await nag.setup(false);
             grp = supData.groups[0];
             expect(supData.nag.last.getTime()).to.be.not.eq(new Date(0).getTime());
@@ -78,4 +81,4 @@ describe("Nagging", () => {
             }
         });
     });
-})
+});
