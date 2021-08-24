@@ -16,18 +16,8 @@ describe("Nagging", () => {
         rocket.driver.reset();
         supData.reset();
     });
-    it("has a setup and stop", () => {
-        assert(!!nag.setup);
-        assert(!!nag.stop);
-    });
-    it("registers an interval on setup", async () => {
-        let i = await nag.setup();
-        assert(!!i);
-        nag.stop();
-    });
-    it("does not register an interval on setup(false)", async () => {
-        let i = await nag.setup(false);
-        assert(!i);
+    it("has a run function", () => {
+        assert(!!nag.run);
     });
     describe("Handling users", () => {
         beforeEach(() => {
@@ -44,7 +34,7 @@ describe("Nagging", () => {
             supData.nag.time = [0,0];
             rocket.api.get.resetHistory();
             rocket.api.get.returns({members: []});
-            await nag.setup(false);
+            await nag.run();
             grp = supData.groups[0];
             expect(supData.nag.last.getTime()).to.be.not.eq(new Date(0).getTime());
             expect(rocket.driver.getDirectMessageRoomId.calledWith("test.user"));
@@ -56,7 +46,7 @@ describe("Nagging", () => {
             const expected = messages.getMessage(messages.messageList.BEGIN, {name: "Test User"});
             supData.nag.time = [0,0];
             supData.nag.last = new Date(0);
-            await nag.setup(false);
+            await nag.run();
             expect(rocket.driver.messages[0].msg).to.be.eq(expected);
         });
         it("captures errors when sending messages", async () => {
@@ -68,7 +58,7 @@ describe("Nagging", () => {
             supData.nag.time = [0,0];
             supData.nag.last = new Date(0);
             try {
-                await nag.setup(false);
+                await nag.run();
                 //undo stubbing
                 expect(log.error.calledTwice);
                 expect(log.error.firstCall.args[0]).to.be.eq("Error when sending DM to Test User");

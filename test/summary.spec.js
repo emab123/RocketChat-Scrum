@@ -30,22 +30,11 @@ describe("Summary", () => {
         rocket.driver.reset();
         supData.reset();
     });
-    it("has a setup and stop", () => {
-        assert(!!summary.setup);
-        assert(!!summary.stop);
-    });
-    it("registers an interval on setup", async () => {
-        let i = await summary.setup();
-        assert(!!i);
-        //cleanup
-        summary.stop();
-    });
-    it("does not register an interval on setup(false)", async () => {
-        let i = await summary.setup(false);
-        expect(i).to.be.null;
+    it("has a run function", () => {
+        assert(!!summary.run);
     });
     it("updates the groups when iterating", async () => {
-        await summary.setup(false);
+        await summary.run();
         expect(supData.findGroups.called).to.be.true;
     });
     it("sends a summary of multiple messages if it hasn't been published yet", async () => {
@@ -84,7 +73,7 @@ describe("Summary", () => {
         }, "test-id1");
         genFakeMessage("works", "awesome", "totally")
         genFakeMessage("even", "Better", "than before");
-        await summary.setup(false);
+        await summary.run();
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
     it("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
@@ -125,7 +114,7 @@ describe("Summary", () => {
         genFakeMessage("works", "immediately", "not");
         supData.groups[0].last_summary = new Date();
         supData.groups[1].last_summary = new Date();
-        await summary.setup(false);
+        await summary.run();
         expect(rocket.driver.messages).length(1);
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
@@ -140,24 +129,22 @@ describe("Summary", () => {
             stage: 4,
             messages: ["works", "immediately", "not"]
         });
-        await summary.setup(false);
+        await summary.run();
         expect(rocket.driver.messages).lengthOf(2);
         expect(rocket.driver.messages[0]).has.property("rid", "test-id1");
         expect(rocket.driver.messages[1]).has.property("rid", "test-id2");
     });
-    it("captures exceptions", async () => {
+    it("handles exceptions", async () => {
         let old = rocket.driver.sendMessage;
         rocket.driver.sendMessage = sinon.stub().throws();
         sinon.stub(log, "error");
         genFakeMessage("works", "immediately", "not");
         genFakeMessage("works", "immediately", "not");
         try {
-            await summary.setup(false);
+            await summary.run();
+            expect.fail("Should have thrown");
         } catch {
-            expect.fail("Should not have thrown");
         }
-        expect(log.error.calledTwice);
-        expect(log.error.firstCall.args).to.be.eql(["Summary has thrown the following error"]);
         log.error.restore();
         rocket.driver.sendMessage = old;
     });
