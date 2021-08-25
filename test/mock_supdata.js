@@ -11,6 +11,7 @@ if(process.env.DEBUG) {
 sinon.stub(supData, "findGroups");
 sinon.stub(supData, "store");
 sinon.stub(supData, "load");
+sinon.stub(supData, "updatePendingStatus");
 
 supData.reset = function() {
     this.responses = [];

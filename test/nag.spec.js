@@ -23,6 +23,7 @@ describe("Nagging", () => {
         beforeEach(() => {
             let grp = new Group({_id: "test1", name: "test1", fname: "Test1"});
             grp.users.set("test.user", {username: "test.user", name: "Test User", status: "online" });
+            grp.users.set("invisible.user", {username: "invisible.user", name: "Invisible User", status: "invisible" });
             grp.users.set("offline.user", {username: "offline.user", name: "Offline User", status: "offline" });
             supData.groups = [grp];
         });
@@ -38,9 +39,10 @@ describe("Nagging", () => {
             grp = supData.groups[0];
             expect(supData.nag.last.getTime()).to.be.not.eq(new Date(0).getTime());
             expect(rocket.driver.getDirectMessageRoomId.calledWith("test.user"));
-            expect(rocket.driver.messages).length(1);
+            expect(rocket.driver.messages).length(2);
             expect(supData.pending).length(1);
             expect(supData.pending[0]).property("username").to.be.eq("offline.user");
+            expect(supData.updatePendingStatus.calledOnce).to.be.false;
         });
         it("uses the correct message for nagging", async () => {
             const expected = messages.getMessage(messages.messageList.BEGIN, {name: "Test User"});
@@ -48,6 +50,21 @@ describe("Nagging", () => {
             supData.nag.last = new Date(0);
             await nag.run();
             expect(rocket.driver.messages[0].msg).to.be.eq(expected);
+        });
+        it("updates the status when notifying pending users", async () => {
+            let t = sinon.useFakeTimers();
+            supData.nag.last = new Date(43200000);
+            supData.nag.time = [0,1];
+            grp = supData.groups[0];
+            supData.pending.push(grp.users.get("offline.user"));
+            rocket.api.get.resetHistory();
+            rocket.api.get.returns({members: []});
+            await nag.run();
+            expect(rocket.driver.messages).length(0);
+            expect(supData.pending).length(1);
+            expect(supData.pending[0]).property("username").to.be.eq("offline.user");
+            expect(supData.updatePendingStatus.calledOnce).to.be.true;
+            t.restore();
         });
         it("captures errors when sending messages", async () => {
             let old = rocket.driver.sendMessage;
