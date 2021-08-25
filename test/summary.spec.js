@@ -15,7 +15,7 @@ log.setDefaultLevel(5);
 function genFakeMessage() {
     let g = supData.groups.find(e => e._id == "test-id1");
     g.responses.push({
-        "user": "test" + g.responses.length,
+        "user": { _id: "testid" + g.responses.length, username: "test" + g.responses.length, name: "Test" + g.responses.length + ", Name", status: "online" },
         "stage": 1 + arguments.length,
         "messages": arguments
     });
@@ -78,7 +78,12 @@ describe("Summary", () => {
     });
     it("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
         const expectedMessage = rocket.driver.prepareMessage({
-            msg: messages.getMessage(messages.messageList.LATE_SUMMARY, {user: "test0"}),
+            msg: messages.getMessage(messages.messageList.LATE_SUMMARY, { user: {
+                "_id": "testid",
+                "username": "test0",
+                "status": "online",
+                "name": "Test, User"
+              }}),
             bot: { i: 'js.SDK' },
             attachments: [
                 {

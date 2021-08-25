@@ -14,7 +14,7 @@ describe("Messages", () => {
     });
     it("enters valid data", () => {
         const expected = `Hey @here, @test hat noch einen Stand-Up nachgeliefert👌🐱‍👓\r\n`
-        expect(msg.getMessage(msg.messageList.LATE_SUMMARY, {user: "test"})).to.be.eq(expected);
+        expect(msg.getMessage(msg.messageList.LATE_SUMMARY, {user: {_id: "testid", username: "test", name: "User, Test"}})).to.be.eq(expected);
     });
     it("responds with unknown on invalid id", () => {
         const expected = `Ich melde mich wieder, wenn ich etwas neues wissen muss 😜.`;
