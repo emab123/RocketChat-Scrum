@@ -37,7 +37,7 @@ describe("Summary", () => {
         await summary.run();
         expect(supData.findGroups.called).to.be.true;
     });
-    it("sends a summary of multiple messages if it hasn't been published yet", async () => {
+    it.skip("sends a summary of multiple messages if it hasn't been published yet", async () => {
         const expectedMessage = new rocket.driver.prepareMessage({
             msg: messages.getMessage(messages.messageList.SUMMARY),
             bot: { i: 'js.SDK' },
@@ -76,7 +76,7 @@ describe("Summary", () => {
         await summary.run();
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
-    it("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
+    it.skip("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
         const expectedMessage = rocket.driver.prepareMessage({
             msg: messages.getMessage(messages.messageList.LATE_SUMMARY, { user: {
                 "_id": "testid",
@@ -123,7 +123,7 @@ describe("Summary", () => {
         expect(rocket.driver.messages).length(1);
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
-    it("sends messages to multiple groups", async () => {
+    it.skip("sends messages to multiple groups", async () => {
         supData.groups[0].responses.push({
             user: "test0",
             stage: 4,
