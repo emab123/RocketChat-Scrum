@@ -22,6 +22,28 @@ describe("Groups", () => {
         //cleanup
         process.env.BOT_TIME_SUMMARY = undefined;
     });
+    it("Loads a json and converts all types", () => {
+        let data = {
+            summary: [1,2],
+            reportDays: [3,4],
+            last_summary: (new Date(0)).toString(),
+            responses: [{ username: "Test", messages: ["1","2"]}],
+            users: ["i'm", "ignored"],
+            _id: "id",
+            fname: "FNAME",
+            name: "NAME"
+        }
+        let g = Group.fromJSON(JSON.parse(JSON.stringify(data)));
+        expect(g._id).to.be.eq("id");
+        expect(g.fname).to.be.eq("FNAME");
+        expect(g.name).to.be.eq("NAME");
+        expect(g.summary).to.be.deep.eq([1,2]);
+        expect(g.responses).to.have.length(1).and.deep.includes(data.responses[0]);
+        expect(g.users).to.be.instanceOf(Map);
+        expect(g.last_summary).to.be.instanceOf(Date);
+        expect(g.last_summary).to.be.deep.eq(new Date(0));
+        expect(g.reportDays).to.have.length(2).and.be.deep.eq([3,4]);
+    });
 
     it("Searches for users", async () => {
         let user = {username: "user", user: "test.user", _id: "userid"};
