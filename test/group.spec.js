@@ -5,6 +5,9 @@ const log = require("loglevel");
 const Group = require("../lib/group");
 
 describe("Groups", () => {
+    after(() => {
+        rocket.driver.reset();
+    })
     it("Loads a group and applies defaults", () => {
         process.env.BOT_TIME_SUMMARY = "11:12";
         let g = new Group({fname: "test", name: "test1", _id: "id"});
@@ -16,6 +19,8 @@ describe("Groups", () => {
         expect(g.reportDays).to.be.deep.eq([1,2,3,4,5]);
         expect(g.summary_time.getHours()).to.be.eq(11);
         expect(g.summary_time.getMinutes()).to.be.eq(12);
+        //cleanup
+        process.env.BOT_TIME_SUMMARY = undefined;
     });
 
     it("Searches for users", async () => {

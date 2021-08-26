@@ -23,21 +23,24 @@ function genFakeMessage() {
 
 describe("Summary", () => {
     beforeEach(() => {
-        supData.groups.push(new Group({_id: "test-id1", fname: "Test 1", name: "test1", _summary: [0,0], reportDays: [0,1,2,3,4,5,6]}));
-        supData.groups.push(new Group({_id: "test-id2", fname: "Test 2", name: "test2", _summary: [0,0], reportDays: [0,1,2,3,4,5,6]}));
+        supData.reset();
+        this.timer = sinon.useFakeTimers(new Date(43200000));
+        supData.groups.push(new Group({_id: "test-id1", fname: "Test 1", name: "test1", summary: [1,2], last_summary: new Date(0), reportDays: [0,1,2,3,4,5,6]}));
+        supData.groups.push(new Group({_id: "test-id2", fname: "Test 2", name: "test2", summary: [1,2], last_summary: new Date(0), reportDays: [0,1,2,3,4,5,6]}));
     });
     afterEach(() => {
         rocket.driver.reset();
         supData.reset();
+        this.timer.restore();
     });
     it("has a run function", () => {
-        assert(!!summary.run);
+        expect(summary).to.have.property("run");
     });
     it("updates the groups when iterating", async () => {
         await summary.run();
         expect(supData.findGroups.called).to.be.true;
     });
-    it.skip("sends a summary of multiple messages if it hasn't been published yet", async () => {
+    it("sends a summary of multiple messages if it hasn't been published yet", async () => {
         const expectedMessage = new rocket.driver.prepareMessage({
             msg: messages.getMessage(messages.messageList.SUMMARY),
             bot: { i: 'js.SDK' },
@@ -76,7 +79,7 @@ describe("Summary", () => {
         await summary.run();
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
-    it.skip("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
+    it("sends a immediate summary of multiple messages indivually, if publish was due", async () => {
         const expectedMessage = rocket.driver.prepareMessage({
             msg: messages.getMessage(messages.messageList.LATE_SUMMARY, { user: {
                 "_id": "testid",
@@ -123,7 +126,7 @@ describe("Summary", () => {
         expect(rocket.driver.messages).length(1);
         expect(rocket.driver.messages[0]).to.be.deep.eq(expectedMessage);
     });
-    it.skip("sends messages to multiple groups", async () => {
+    it("sends messages to multiple groups", async () => {
         supData.groups[0].responses.push({
             user: "test0",
             stage: 4,
