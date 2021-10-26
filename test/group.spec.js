@@ -57,18 +57,15 @@ describe("Groups", () => {
         //reset
         rocket.api.get.returns();
     });
-
     it("Handles errors on user searching", async () => {
         let old = rocket.api.get;
         rocket.api.get = sinon.stub().throws();
-        sinon.stub(log, "error");
         let g = new Group({fname: "test", name: "test1", _id: "id"});
         try {
             await g.findUsers();
-        } catch {
+        } catch(e) {
             expect.fail("Should not have been called");
         }
-        log.error.restore();
         rocket.api.get = old;
     });
 });

@@ -1,7 +1,10 @@
+const log = require("loglevel");
 const { expect } = require("chai");
 const fs = require("fs");
 const rocket = require("./mock_rocket");
 const sinon = require("sinon");
+
+const utils = require('util');
 
 delete require.cache[require.resolve('../lib/data')];
 const supData = require("../lib/data");
@@ -9,7 +12,7 @@ const Group = require("../lib/group");
 
 
 describe("Stand-Up-Data", () => {
-    it("Loads an data file and sets the values", async () => {
+    it("loads an data file and sets the values", async () => {
         process.env.BOT_TIME_NAG = "0:1";
         let data = {
             groups: [{ _id: "test-id1", fname: "test", name: "Testing", summary: [2, 2], reportDays: [0, 1, 2, 3, 4, 5, 6] }],
@@ -39,7 +42,7 @@ describe("Stand-Up-Data", () => {
         process.env.DATA_FILE = old;
         fs.promises.readFile.restore();
     });
-    it("Loads the default on empty data file", async () => {
+    it("loads the default on empty data file", async () => {
         sinon.stub(fs.promises, "readFile").returns("{}");
         await supData.load();
         expect(fs.promises.readFile.called).to.be.true;
@@ -47,7 +50,7 @@ describe("Stand-Up-Data", () => {
         expect(supData.pending).to.be.eql([]);
         fs.promises.readFile.restore();
     });
-    it("Handles non existent files", async () => {
+    it("handles non existent files", async () => {
         sinon.stub(fs.promises, "readFile").throws();
         try {
             await supData.load();
@@ -56,14 +59,14 @@ describe("Stand-Up-Data", () => {
         }
         fs.promises.readFile.restore();
     });
-    it("Writes file on store", async () => {
+    it("writes file on store", async () => {
         sinon.stub(fs.promises, "writeFile");
         await supData.store();
         expect(fs.promises.writeFile.called).to.be.true;
         expect(fs.promises.writeFile.firstCall.firstArg).to.be.eq(process.env.DATA_FILE);
         fs.promises.writeFile.restore();
     });
-    it("Handles write errors on store", async () => {
+    it("handles write errors on store", async () => {
         sinon.stub(fs.promises, "writeFile").throws();
         try {
             await supData.store();
@@ -72,7 +75,7 @@ describe("Stand-Up-Data", () => {
         }
         fs.promises.writeFile.restore();
     })
-    it("Sets users pending", () => {
+    it("sets users pending", () => {
         const usr = { _id: "testid", username: "test"};
         const grp = new Group({ _id: "1", name: "test", fname: "Test" });
         grp.users.set("test", usr);
@@ -82,7 +85,7 @@ describe("Stand-Up-Data", () => {
         supData.groups = [];
         supData.pending = [];
     });
-    it("Sets a user only once pending", () => {
+    it("sets a user only once pending", () => {
         const usr = { user: "testid", username: "test"};
         const grp1 = new Group({ _id: "1", name: "test", fname: "Test" });
         grp1.users.set("testid", usr);
@@ -95,7 +98,7 @@ describe("Stand-Up-Data", () => {
         supData.groups = [];
         supData.pending = [];
     })
-    it("Asks the API to find groups", async () => {
+    it("asks the API to find groups", async () => {
         const groups = [{ _id: "test1-id", fname: "test", name: "test1" }];
         const members = [{
             username: "test",
@@ -113,4 +116,17 @@ describe("Stand-Up-Data", () => {
         rocket.api.get.returns();
         rocket.api.get.resetHistory();
     });
+    it("handles errors when API fails to respond", async () => {
+        rocket.api.get.reset();
+        rocket.api.get.throws({code: "test", errno: 1});
+        sinon.spy(log, "warn");
+        try {
+            await supData.findGroups();
+        } catch(e) {
+            expect.fail("Has thrown");
+        }
+        expect(log.warn.called).to.be.true;
+        rocket.api.get.returns();
+        log.warn.restore();
+    })
 });

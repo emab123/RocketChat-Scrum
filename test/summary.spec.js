@@ -150,9 +150,11 @@ describe("Summary", () => {
         genFakeMessage("works", "immediately", "not");
         try {
             await summary.run();
-            expect.fail("Should have thrown");
-        } catch {
+        } catch(e) {
+            expect.fail("Should have not thrown");
         }
+        expect(log.error.called).to.be.true;
+        expect(log.error.callCount).to.be.eq(2);
         log.error.restore();
         rocket.driver.sendMessage = old;
     });

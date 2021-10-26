@@ -70,7 +70,7 @@ describe("Nagging", () => {
             let old = rocket.driver.sendMessage;
             rocket.api.get.resetHistory();
             rocket.api.get.returns({members: []});
-            rocket.driver.sendMessage = sinon.stub().throws();
+            rocket.driver.sendMessage = sinon.stub().throws({ code: "test", errno: 1 });
             sinon.stub(log, "error");
             supData.nag.time = [0,0];
             supData.nag.last = new Date(0);
@@ -78,7 +78,7 @@ describe("Nagging", () => {
                 await nag.run();
                 //undo stubbing
                 expect(log.error.calledTwice);
-                expect(log.error.firstCall.args[0]).to.be.eq("Error when sending DM to Test User");
+                expect(log.error.firstCall.args[0]).to.be.eq("Error when sending DM to Test User: test");
                 expect(rocket.api.get.calledOnce);
             } catch(e) {
                 assert(false, "It has thrown" + e.toString());
