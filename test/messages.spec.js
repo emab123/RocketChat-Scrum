@@ -9,7 +9,7 @@ describe("Messages", () => {
         assert(msg.stageToMessage(0) === msg.messageList.DONE_SINCE_YESTERDAY);
     });
     it("creates a message", () => {
-        const expected = "Steht dir irgendwas im Weg?";
+        const expected = "Gibt es Ergebnisse oder Input, die du brauchst um weitermachen zu können?";
         assert(msg.getMessage(msg.messageList.OBSTACLES) === expected);
     });
     it("enters valid data", () => {
