@@ -9,7 +9,7 @@ const { findNextResponseForUser } = require("./mock_supdata");
 
 chai.should();
 
-describe.only("Responses", function() {
+describe("Responses", function() {
     before(function (){
         this.msg = (name, ...params) => getMessage(name, ...params);
     });
