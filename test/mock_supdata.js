@@ -8,14 +8,14 @@ if(process.env.DEBUG) {
     log.setLevel(log.levels.DEBUG);
 }
 
-sinon.stub(supData, "findNextResponseForUser");
-sinon.stub(supData, "findGroups");
-sinon.stub(supData, "store");
-sinon.stub(supData, "load");
-sinon.stub(supData, "updatePendingStatus");
+const mockedFns = ["findNextResponseForUser", "findGroups", "store", "load", "updatePendingStatus", "getUserSettings"];
+
+for(let m of mockedFns) {
+    sinon.stub(supData, m);
+}
 
 supData.reset = function() {
-    for(let m of ["findNextResponseForUser", "findGroups", "store", "load", "updatePendingStatus"]) {
+    for(let m of mockedFns) {
         supData[m].resetHistory();
     }
     this.responses = [];
