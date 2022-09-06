@@ -1,6 +1,6 @@
 {
   "name": "rocket-chat-daily-standup",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Chatbot for EduCS RocketChat",
   "scripts": {
     "bot": "node index.js",

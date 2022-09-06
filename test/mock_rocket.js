@@ -25,9 +25,16 @@ rocket.driver.messages = [];
 sinon.stub(rocket.driver, "sendMessage").callsFake(function(msg) {
     this.messages.push(msg);
 });
+sinon.stub(rocket.driver, "sendToRoomId").callsFake(function(msg) {
+    this.messages.push(msg);
+})
 
 rocket.driver.reset = function() {
     this.messages = [];
+    for(let m of ["asyncCall", "logout", "connect", "disconnect", "getDirectMessageRoomId", "subscribeToMessages", "reactToMessages", "sendToRoomId", "sendMessage"]) {
+        rocket.driver[m].resetHistory();
+    }
+    rocket.api.get.resetHistory();
 }
 
 sinon.stub(rocket.api, "get");
