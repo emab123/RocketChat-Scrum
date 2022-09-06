@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup/compare/v1.1.2...v1.1.3) (2022-09-06)
+
+
+### Bug Fixes
+
+* build updates ([0930255](https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup/commit/0930255c4a2f8e6cd4fb98f3e42c54a7e1498cc8))
+* minor scripts ([259df5b](https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup/commit/259df5b4ca7c227736911ec206cfbf7243ffd79f))
+
 ### [1.1.2](https://gitlab.tba-hosting.de/schiffner/rocket-chat-daily-standup/compare/v1.1.1...v1.1.2) (2022-04-28)
 
 
