@@ -1,6 +1,5 @@
 .env*
 .gitlab-ci.yml
-node_modules
 data.json
 Dockerfile
 README.md

@@ -1,8 +1,10 @@
 variables:
   TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  NODE_IMAGE: node:17-alpine
 
 stages:
+  - prepare
   - test
   - release
   - deploy
@@ -14,19 +16,30 @@ include:
 
 #in general login
 
+prepare:
+  stage: prepare
+  image: $NODE_IMAGE
+  script:
+    - npm ci
+    - ls -lah
+
 test:
   stage: test
-  image: node:17-alpine
+  image: $NODE_IMAGE
   tags:
     - docker
+  cache:
+    policy: pull
   script:
-    - npm ci --cache .npm --prefer-offline
+    - npm ci
     - npm test
 
 release-image:
   stage: release
   tags:
     - docker builder
+  cache:
+    policy: pull
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $RELEASE_IMAGE .
@@ -38,6 +51,7 @@ release-image:
 deploy:
   stage: deploy
   image: curlimages/curl
+  cache:
   script:
     - "curl -X POST -F token=$TRIGGER_TOKEN -F ref=$CI_COMMIT_BRANCH https://gitlab.tba-hosting.de/api/v4/projects/317/trigger/pipeline"
   only:
