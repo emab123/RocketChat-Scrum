@@ -28,6 +28,10 @@ test:
   tags:
     - docker
   cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm
+      - node_modules
     policy: pull
   script:
     - npm install
@@ -38,6 +42,10 @@ release-image:
   tags:
     - docker builder
   cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm
+      - node_modules
     policy: pull
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
