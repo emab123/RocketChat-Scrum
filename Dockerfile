@@ -6,10 +6,7 @@ ENV TZ=Europe/Berlin
 
 USER rocket
 WORKDIR /app
-COPY --chown=rocket:rocket package.json node_modules /app/
-
-COPY --chown=rocket:rocket lib/ /app/lib
-COPY --chown=rocket:rocket index.js /app/
+COPY --chown=rocket:rocket package.json node_modules lib index.js /app/
 
 ENV TZ=Europe/Berlin
 ENV DATA_FILE /data/data.json
