@@ -27,12 +27,10 @@ release-image:
   stage: release
   tags:
     - docker builder
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $RELEASE_IMAGE .
     - docker push $RELEASE_IMAGE
-  after_script:
     - docker logout
   only:
     - master
