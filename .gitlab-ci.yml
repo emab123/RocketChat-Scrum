@@ -20,8 +20,7 @@ prepare:
   stage: prepare
   image: $NODE_IMAGE
   script:
-    - npm ci
-    - ls -lah
+    - npm ci --omit dev
 
 test:
   stage: test
@@ -31,7 +30,7 @@ test:
   cache:
     policy: pull
   script:
-    - npm ci
+    - npm install
     - npm test
 
 release-image:
